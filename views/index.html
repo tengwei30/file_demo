@@ -1,0 +1,58 @@
+<!--
+ * @Author: xiaosong
+ * @Date: 2021-06-08 15:19:43
+ * @LastEditTime: 2022-03-04 16:33:56
+ * @LastEditors: Please set LastEditors
+ * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: /realworld-express/views/index.html
+-->
+<!--index.art-->
+{{extend './layout/layout.html'}}
+
+{{ block 'body' }}
+<div class="home-page" id="index">
+  <div class="banner">
+    <div class="container">
+      <h1 class="logo-font">查找文件Demo</h1>
+      <p v-for="(item,index) in fileList" :key="item">{% item %}</p>
+    </div>
+  </div>
+
+</div>   
+{{/block}}
+{{ block 'script' }}
+<script>
+  ;(() => { 
+    const app = new Vue({
+      el: '#index',
+      data() {
+        return {
+          fileList: [],
+          timer: null
+        }
+      },
+      async mounted() {
+        this.initData()
+      },
+      beforeDestroy() {
+        clearInterval(this.timer)
+      },
+      methods: {
+        async initData() {
+          // 客户端表单验证
+          try {
+            const res = await axios.get('/files')
+            if (res.data.code !== '00000') return
+            this.fileList = res.data.data
+            this.timer = setInterval(() => {
+              this.initData()
+            }, 5000)
+          } catch (error) {
+            console.error('error ----> ', error)
+          }
+        }
+      }
+    })
+  })()
+</script>
+{{ /block }}
